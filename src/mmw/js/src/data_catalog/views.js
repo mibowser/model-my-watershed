@@ -88,7 +88,7 @@ var DataCatalogWindow = Marionette.LayoutView.extend({
         this.ui.introText.addClass('hide');
         this.ui.tabs.removeClass('hide');
 
-        catalog.search(query, fromDate, toDate, bounds);
+        catalog.searchIfNeeded(query, fromDate, toDate, bounds);
     },
 
     updateMap: function() {

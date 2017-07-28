@@ -29,6 +29,23 @@ var Catalog = Backbone.Model.extend({
         error: '',
     },
 
+    searchIfNeeded: function(query, fromDate, toDate, bounds) {
+        var self = this,
+            isSameSearch = query === this.get('query') &&
+                           fromDate === this.get('fromDate') &&
+                           toDate === this.get('toDate') &&
+                           utils.formatBounds(bounds) === this.get('bbox');
+
+        if (!isSameSearch) {
+            this.searchPromise = this.search(query, fromDate, toDate, bounds)
+                                     .always(function() {
+                                        delete self.searchPromise;
+                                     });
+        }
+
+        return this.searchPromise || $.when();
+    },
+
     search: function(query, fromDate, toDate, bounds) {
         this.set({
             query: query,
