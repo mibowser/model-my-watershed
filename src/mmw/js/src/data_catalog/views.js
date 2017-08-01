@@ -44,7 +44,7 @@ var DataCatalogWindow = Marionette.LayoutView.extend({
     },
 
     collectionEvents: {
-        'change:active, change:loading': 'updateMap'
+        'change:active change:loading': 'updateMap'
     },
 
     onShow: function() {
@@ -94,7 +94,7 @@ var DataCatalogWindow = Marionette.LayoutView.extend({
 
     updateMap: function() {
         var catalog = this.getActiveCatalog(),
-            geoms = catalog.get('results').pluck('geom');
+            geoms = catalog && catalog.get('results').pluck('geom');
         App.map.set('dataCatalogResults', geoms);
     }
 });
