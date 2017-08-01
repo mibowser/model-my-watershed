@@ -82,13 +82,14 @@ var DataCatalogWindow = Marionette.LayoutView.extend({
             query = this.model.get('query'),
             fromDate = this.model.get('fromDate'),
             toDate = this.model.get('toDate'),
-            bounds = L.geoJson(App.map.get('areaOfInterest')).getBounds();
+            aoiLeafletBounds = App.map.get('areaOfInterest')).getBounds(),
+            bounds = utils.formatBounds(L.geoJson(aoiLeafletBounds);
 
         // Disable intro text after first search request
         this.ui.introText.addClass('hide');
         this.ui.tabs.removeClass('hide');
 
-        catalog.searchIfNeeded(query, fromDate, toDate, bounds);
+        catalog.searchIfNeeded(query, fromDate, toDate, formattedBounds);
     },
 
     updateMap: function() {
