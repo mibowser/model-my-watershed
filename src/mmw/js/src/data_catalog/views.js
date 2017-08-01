@@ -236,9 +236,7 @@ var ErrorView = Marionette.ItemView.extend({
 });
 
 var TabContentView = Marionette.LayoutView.extend({
-    className: function() {
-        return 'tab-pane' + (this.model.get('active') ? ' active' : '');
-    },
+    className: 'tab-pane',
     id: function() {
         return this.model.id;
     },
@@ -258,10 +256,13 @@ var TabContentView = Marionette.LayoutView.extend({
     },
 
     modelEvents: {
-        'change': 'update'
+        'change': 'update',
+        'change:active': 'toggleActiveClass',
     },
 
     onShow: function() {
+        this.toggleActiveClass();
+
         this.resultRegion.show(new ResultsView({
             collection: this.model.get('results'),
             catalog: this.model.id,
@@ -277,6 +278,10 @@ var TabContentView = Marionette.LayoutView.extend({
                 model: this.model,
             }));
         }
+    },
+
+    toggleActiveClass: function() {
+        this.$el.toggleClass('active', this.model.get('active'));
     },
 
     update: function() {
