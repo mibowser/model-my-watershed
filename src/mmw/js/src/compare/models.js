@@ -68,7 +68,7 @@ var WindowModel = Backbone.Model.extend({
         Backbone.Model.prototype.initialize.apply(this, arguments);
 
         this.set({
-            controls: new ControlsCollection(attrs.controls),
+            controls: attrs.controls,
             tabs: new TabsCollection(attrs.tabs),
             scenarios: attrs.scenarios,
         });
@@ -84,6 +84,7 @@ var WindowModel = Backbone.Model.extend({
 module.exports = {
     ChartRowModel: ChartRowModel,
     ChartRowsCollection: ChartRowsCollection,
+    ControlsCollection: ControlsCollection,
     TableRowModel: TableRowModel,
     TableRowsCollection: TableRowsCollection,
     TabModel: TabModel,

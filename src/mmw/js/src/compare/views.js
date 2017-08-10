@@ -723,7 +723,8 @@ function showCompare() {
         isTr55 = model_package === modelingModels.TR55_PACKAGE,
         scenarios = getCompareScenarios(isTr55),
         tabs = isTr55 ? formatTr55CompareData(scenarios) : getGwlfeTabs(scenarios),
-        controls = isTr55 ? [{ name: 'precipitation' }] : [],
+        controlsJson = isTr55 ? [{ name: 'precipitation' }] : [],
+        controls = new models.ControlsCollection(controlsJson),
         compareModel = new models.WindowModel({
             controls: controls,
             tabs: tabs,
