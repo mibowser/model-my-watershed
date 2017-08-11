@@ -6,6 +6,7 @@ var _ = require('lodash'),
     App = require('../app'),
     coreModels = require('../core/models'),
     coreViews = require('../core/views'),
+    coreUtils = require('../core/utils'),
     chart = require('../core/chart.js'),
     models = require('./models'),
     modelingModels = require('../modeling/models'),
@@ -501,17 +502,9 @@ var CompareModificationsView = Marionette.ItemView.extend({
     }
 });
 
-function getPrecipitationFromScenarios(scenarios) {
-    return scenarios
-        .findWhere({ active: true })
-        .get('inputs')
-        .findWhere({ name: 'precipitation' });
-}
-
-function formatTr55CompareData(scenarios) {
+function formatTr55CompareData(scenarios, precipitationControl) {
     // Convert value from inches to centimeters
-    var precipitation = getPrecipitationFromScenarios(scenarios)
-        .get('value') * 2.54;
+    var precipitation = coreUtils.convertToMetric(precipitationControl.get('value'), 'in');
 
     // TODO Account for loading and error scenarios
     var runoffTable = [
@@ -588,7 +581,6 @@ function formatTr55CompareData(scenarios) {
                         .get('result')
                         .runoff.modified.et;
                 }),
-                precipitation: precipitation,
             },
             {
                 name: "Runoff",
@@ -602,7 +594,6 @@ function formatTr55CompareData(scenarios) {
                         .get('result')
                         .runoff.modified.runoff;
                 }),
-                precipitation: precipitation,
             },
             {
                 name: "Infiltration",
@@ -616,7 +607,6 @@ function formatTr55CompareData(scenarios) {
                         .get('result')
                         .runoff.modified.inf;
                 }),
-                precipitation: precipitation,
             }
         ],
         // TODO Calculate Water Quality table
@@ -722,7 +712,10 @@ function showCompare() {
     var model_package = App.currentProject.get('model_package'),
         isTr55 = model_package === modelingModels.TR55_PACKAGE,
         scenarios = getCompareScenarios(isTr55),
-        tabs = isTr55 ? formatTr55CompareData(scenarios) : getGwlfeTabs(scenarios),
+        precipitationControl = scenarios.findWhere({ active: true })
+                                        .get('inputs')
+                                        .findWhere({ name: 'precipitation' }),
+        tabs = isTr55 ? formatTr55CompareData(scenarios, precipitationControl) : getGwlfeTabs(scenarios),
         controlsJson = isTr55 ? [{ name: 'precipitation' }] : [],
         controls = new models.ControlsCollection(controlsJson),
         compareModel = new models.WindowModel({
@@ -733,7 +726,7 @@ function showCompare() {
 
     if (isTr55) {
         // Set compare model to have same precipitation as active scenario
-        compareModel.addOrReplaceInput(getPrecipitationFromScenarios(scenarios));
+        compareModel.addOrReplaceInput(precipitationControl);
     }
 
     App.rootView.compareRegion.show(new CompareWindow2({
