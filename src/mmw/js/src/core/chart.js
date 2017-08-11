@@ -379,7 +379,7 @@ function renderCompareMultibarChart(chartEl, name, label, colors, stacked, data,
              .ticks(tickCount)
              .showMaxMin(true);
 
-        chart.tooltip.enabled(false);
+        chart.tooltip.enabled(true);
 
         setChartWidth();
 
