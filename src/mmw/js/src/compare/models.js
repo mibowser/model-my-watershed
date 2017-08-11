@@ -1,6 +1,7 @@
 "use strict";
 
 var _ = require('lodash'),
+    coreUtils = require('../core/utils'),
     Backbone = require('../../shim/backbone'),
     ControlsCollection = require('../modeling/models').ModelPackageControlsCollection;
 
@@ -9,6 +10,7 @@ var CHART = 'chart',
 
 var ChartRowModel = Backbone.Model.extend({
     defaults: {
+        key: '',
         name: '',
         chartDiv: '',
         seriesColors: [],
@@ -21,6 +23,56 @@ var ChartRowModel = Backbone.Model.extend({
 
 var ChartRowsCollection = Backbone.Collection.extend({
     model: ChartRowModel,
+
+    /**
+     * Initialize collection by storing the given scenario collection
+     * and listening to updates to scenario results. Each change fires
+     * an `update` function, which should be defined in the descendants
+     * of this collection.
+     */
+    initialize: function(models, options) {
+        var update = _.bind(this.update, this);
+
+        this.scenarios = options.scenarios;
+
+        this.scenarios.forEach(function(scenario) {
+            scenario.get('results').on('change', update);
+        });
+    }
+});
+
+var Tr55RunoffCharts = ChartRowsCollection.extend({
+    update: function() {
+        var precipitationInput = this.scenarios.first()
+                                               .get('inputs')
+                                               .findWhere({ name: 'precipitation' }),
+            precipitation = coreUtils.convertToMetric(precipitationInput.get('value'), 'in'),
+            results = this.scenarios.map(function(scenario) {
+                return scenario.get('results')
+                               .findWhere({ name: 'runoff' })
+                               .get('result');
+            });
+
+        this.forEach(function(chart) {
+            var key = chart.get('key'),
+                values = [];
+
+            if (key === 'combined') {
+                values = _.map(results, function(result) {
+                    return result.runoff.modified;
+                });
+            } else {
+                values = _.map(results, function(result) {
+                    return result.runoff.modified[key];
+                });
+            }
+
+            chart.set({
+                precipitation: precipitation,
+                values: values
+            });
+        });
+    }
 });
 
 var TableRowModel = Backbone.Model.extend({
@@ -111,6 +163,7 @@ module.exports = {
     TableRowModel: TableRowModel,
     TableRowsCollection: TableRowsCollection,
     Tr55RunoffTable: Tr55RunoffTable,
+    Tr55RunoffCharts: Tr55RunoffCharts,
     TabModel: TabModel,
     TabsCollection: TabsCollection,
     WindowModel: WindowModel,

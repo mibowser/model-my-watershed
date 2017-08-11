@@ -6,7 +6,6 @@ var _ = require('lodash'),
     App = require('../app'),
     coreModels = require('../core/models'),
     coreViews = require('../core/views'),
-    coreUtils = require('../core/utils'),
     chart = require('../core/chart.js'),
     models = require('./models'),
     modelingModels = require('../modeling/models'),
@@ -174,11 +173,15 @@ var ChartRowView = Marionette.ItemView.extend({
     className: 'compare-chart-row',
     template: compareChartRowTmpl,
 
-    onAttach: function() {
-        this.addChart();
+    modelEvents: {
+        'change:values': 'renderChart',
     },
 
-    addChart: function() {
+    onAttach: function() {
+        this.renderChart();
+    },
+
+    renderChart: function() {
         var chartDiv = this.model.get("chartDiv"),
             chartEl = document.getElementById(chartDiv),
             name = this.model.get("name"),
@@ -214,9 +217,6 @@ var ChartRowView = Marionette.ItemView.extend({
 
 var ChartView = Marionette.CollectionView.extend({
     childView: ChartRowView,
-    collectionEvents: {
-        'change': 'render',
-    },
 });
 
 var TableRowView = Marionette.ItemView.extend({
@@ -496,14 +496,12 @@ var CompareModificationsView = Marionette.ItemView.extend({
     }
 });
 
-function formatTr55CompareData(scenarios, precipitationControl) {
-    // Convert value from inches to centimeters
-    var precipitation = coreUtils.convertToMetric(precipitationControl.get('value'), 'in');
-
+function formatTr55CompareData(scenarios) {
     // TODO Account for loading and error scenarios
     var runoffTable = new models.Tr55RunoffTable({ scenarios: scenarios }),
-        runoffCharts = new models.ChartRowsCollection([
+        runoffCharts = new models.Tr55RunoffCharts([
             {
+                key: 'combined',
                 name: "Combined Hydrology",
                 chartDiv: "combined-hydrology-chart",
                 seriesColors: ['#F8AA00', '#CF4300', '#C2D33C'],
@@ -522,55 +520,32 @@ function formatTr55CompareData(scenarios, precipitationControl) {
                     },
                 ],
                 unit: "cm",
-                // TODO: adjust values for combined hydrology
-                values: scenarios.map(function(s) {
-                    return s.get('results')
-                        .findWhere({ name: "runoff" })
-                        .get('result')
-                        .runoff.modified;
-                }),
-                precipitation: precipitation,
             },
             {
+                key: 'et',
                 name: "Evapotranspiration",
                 chartDiv: "evapotranspiration-chart",
                 seriesColors: ['#C2D33C'],
                 legendItems: null,
                 unit: "cm",
-                values: scenarios.map(function(s) {
-                    return s.get('results')
-                        .findWhere({ name: "runoff" })
-                        .get('result')
-                        .runoff.modified.et;
-                }),
             },
             {
+                key: 'runoff',
                 name: "Runoff",
                 chartDiv: "runoff-chart",
                 seriesColors: ['#CF4300'],
                 legendItems: null,
                 unit: "cm",
-                values: scenarios.map(function(s) {
-                    return s.get('results')
-                        .findWhere({ name: "runoff" })
-                        .get('result')
-                        .runoff.modified.runoff;
-                }),
             },
             {
+                key: 'inf',
                 name: "Infiltration",
                 chartDiv: "infiltration-chart",
                 seriesColors: ['#F8AA00'],
                 legendItems: null,
                 unit: "cm",
-                values: scenarios.map(function(s) {
-                    return s.get('results')
-                        .findWhere({ name: "runoff" })
-                        .get('result')
-                        .runoff.modified.inf;
-                }),
             }
-        ]),
+        ], { scenarios: scenarios }),
         // TODO Calculate Water Quality table
         qualityTable = [],
         // TODO Calculate Water Quality charts
@@ -677,7 +652,7 @@ function showCompare() {
         precipitationControl = scenarios.findWhere({ active: true })
                                         .get('inputs')
                                         .findWhere({ name: 'precipitation' }),
-        tabs = isTr55 ? formatTr55CompareData(scenarios, precipitationControl) : getGwlfeTabs(scenarios),
+        tabs = isTr55 ? formatTr55CompareData(scenarios) : getGwlfeTabs(scenarios),
         controlsJson = isTr55 ? [{ name: 'precipitation' }] : [],
         controls = new models.ControlsCollection(controlsJson),
         compareModel = new models.WindowModel({
