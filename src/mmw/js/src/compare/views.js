@@ -501,39 +501,7 @@ function formatTr55CompareData(scenarios, precipitationControl) {
     var precipitation = coreUtils.convertToMetric(precipitationControl.get('value'), 'in');
 
     // TODO Account for loading and error scenarios
-    var runoffTable = new models.TableRowsCollection([
-            {
-                name: "Runoff",
-                unit: "cm",
-                values: scenarios.map(function(s) {
-                    // TODO Make less brittle
-                    return s.get('results')
-                            .findWhere({ name: "runoff" })
-                            .get('result')
-                            .runoff.modified.runoff;
-                })
-            },
-            {
-                name: "Evapotranspiration",
-                unit: "cm",
-                values: scenarios.map(function(s) {
-                    return s.get('results')
-                        .findWhere({ name: "runoff" })
-                        .get('result')
-                        .runoff.modified.et;
-                })
-            },
-            {
-                name: "Inflitration",
-                unit: "cm",
-                values: scenarios.map(function(s) {
-                    return s.get('results')
-                        .findWhere({ name: "runoff" })
-                        .get('result')
-                        .runoff.modified.inf;
-                })
-            },
-        ]),
+    var runoffTable = new models.Tr55RunoffTable({ scenarios: scenarios }),
         runoffCharts = new models.ChartRowsCollection([
             {
                 name: "Combined Hydrology",
