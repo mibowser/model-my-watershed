@@ -182,20 +182,20 @@ var ChartRowView = Marionette.ItemView.extend({
     },
 
     renderChart: function() {
-        var chartDiv = this.model.get("chartDiv"),
+        var chartDiv = this.model.get('chartDiv'),
             chartEl = document.getElementById(chartDiv),
-            name = this.model.get("name"),
-            label = "Level (" + this.model.get("unit") + ")",
-            colors = this.model.get("seriesColors"),
-            stacked = name.indexOf("Hydrology") > -1,
-            precipitation = this.model.get("precipitation"),
-            values = this.model.get("values"),
-            data = stacked ? ["inf", "runoff", "et"].map(function(key) {
+            name = this.model.get('name'),
+            label = 'Level (' + this.model.get('unit') + ')',
+            colors = this.model.get('seriesColors'),
+            stacked = name.indexOf('Hydrology') > -1,
+            precipitation = this.model.get('precipitation'),
+            values = this.model.get('values'),
+            data = stacked ? ['inf', 'runoff', 'et'].map(function(key) {
                     return {
                         key: key,
                         values: values.map(function(value, index) {
                             return {
-                                x: "Series " + index,
+                                x: 'Series ' + index,
                                 y: value[key],
                             };
                         })
@@ -496,54 +496,54 @@ var CompareModificationsView = Marionette.ItemView.extend({
     }
 });
 
-function formatTr55CompareData(scenarios) {
+function getTr55Tabs(scenarios) {
     // TODO Account for loading and error scenarios
     var runoffTable = new models.Tr55RunoffTable({ scenarios: scenarios }),
         runoffCharts = new models.Tr55RunoffCharts([
             {
                 key: 'combined',
-                name: "Combined Hydrology",
-                chartDiv: "combined-hydrology-chart",
+                name: 'Combined Hydrology',
+                chartDiv: 'combined-hydrology-chart',
                 seriesColors: ['#F8AA00', '#CF4300', '#C2D33C'],
                 legendItems: [
                     {
-                        name: "Evapotranspiration",
-                        badgeId: "evapotranspiration-badge",
+                        name: 'Evapotranspiration',
+                        badgeId: 'evapotranspiration-badge',
                     },
                     {
-                        name: "Runoff",
-                        badgeId: "runoff-badge",
+                        name: 'Runoff',
+                        badgeId: 'runoff-badge',
                     },
                     {
-                        name: "Infiltration",
-                        badgeId: "infiltration-badge",
+                        name: 'Infiltration',
+                        badgeId: 'infiltration-badge',
                     },
                 ],
-                unit: "cm",
+                unit: 'cm',
             },
             {
                 key: 'et',
-                name: "Evapotranspiration",
-                chartDiv: "evapotranspiration-chart",
+                name: 'Evapotranspiration',
+                chartDiv: 'evapotranspiration-chart',
                 seriesColors: ['#C2D33C'],
                 legendItems: null,
-                unit: "cm",
+                unit: 'cm',
             },
             {
                 key: 'runoff',
-                name: "Runoff",
-                chartDiv: "runoff-chart",
+                name: 'Runoff',
+                chartDiv: 'runoff-chart',
                 seriesColors: ['#CF4300'],
                 legendItems: null,
-                unit: "cm",
+                unit: 'cm',
             },
             {
                 key: 'inf',
-                name: "Infiltration",
-                chartDiv: "infiltration-chart",
+                name: 'Infiltration',
+                chartDiv: 'infiltration-chart',
                 seriesColors: ['#F8AA00'],
                 legendItems: null,
-                unit: "cm",
+                unit: 'cm',
             }
         ], { scenarios: scenarios }),
         // TODO Calculate Water Quality table
@@ -649,10 +649,7 @@ function showCompare() {
     var model_package = App.currentProject.get('model_package'),
         isTr55 = model_package === modelingModels.TR55_PACKAGE,
         scenarios = getCompareScenarios(isTr55),
-        precipitationControl = scenarios.findWhere({ active: true })
-                                        .get('inputs')
-                                        .findWhere({ name: 'precipitation' }),
-        tabs = isTr55 ? formatTr55CompareData(scenarios) : getGwlfeTabs(scenarios),
+        tabs = isTr55 ? getTr55Tabs(scenarios) : getGwlfeTabs(scenarios),
         controlsJson = isTr55 ? [{ name: 'precipitation' }] : [],
         controls = new models.ControlsCollection(controlsJson),
         compareModel = new models.WindowModel({
@@ -663,7 +660,10 @@ function showCompare() {
 
     if (isTr55) {
         // Set compare model to have same precipitation as active scenario
-        compareModel.addOrReplaceInput(precipitationControl);
+        compareModel.addOrReplaceInput(
+            scenarios.findWhere({ active: true })
+                     .get('inputs')
+                     .findWhere({ name: 'precipitation' }));
     }
 
     App.rootView.compareRegion.show(new CompareWindow2({

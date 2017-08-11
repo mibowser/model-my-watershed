@@ -157,14 +157,9 @@ var WindowModel = Backbone.Model.extend({
 });
 
 module.exports = {
-    ChartRowModel: ChartRowModel,
-    ChartRowsCollection: ChartRowsCollection,
     ControlsCollection: ControlsCollection,
-    TableRowModel: TableRowModel,
-    TableRowsCollection: TableRowsCollection,
     Tr55RunoffTable: Tr55RunoffTable,
     Tr55RunoffCharts: Tr55RunoffCharts,
-    TabModel: TabModel,
     TabsCollection: TabsCollection,
     WindowModel: WindowModel,
     constants: {
