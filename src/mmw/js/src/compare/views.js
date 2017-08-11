@@ -501,7 +501,7 @@ function formatTr55CompareData(scenarios, precipitationControl) {
     var precipitation = coreUtils.convertToMetric(precipitationControl.get('value'), 'in');
 
     // TODO Account for loading and error scenarios
-    var runoffTable = [
+    var runoffTable = new models.TableRowsCollection([
             {
                 name: "Runoff",
                 unit: "cm",
@@ -533,8 +533,8 @@ function formatTr55CompareData(scenarios, precipitationControl) {
                         .runoff.modified.inf;
                 })
             },
-        ],
-        runoffCharts = [
+        ]),
+        runoffCharts = new models.ChartRowsCollection([
             {
                 name: "Combined Hydrology",
                 chartDiv: "combined-hydrology-chart",
@@ -602,13 +602,13 @@ function formatTr55CompareData(scenarios, precipitationControl) {
                         .runoff.modified.inf;
                 }),
             }
-        ],
+        ]),
         // TODO Calculate Water Quality table
         qualityTable = [],
         // TODO Calculate Water Quality charts
         qualityCharts = [];
 
-    return [
+    return new models.TabsCollection([
         {
             name: 'Runoff',
             table: runoffTable,
@@ -620,7 +620,7 @@ function formatTr55CompareData(scenarios, precipitationControl) {
             table: qualityTable,
             charts: qualityCharts,
         },
-    ];
+    ]);
 }
 
 function getGwlfeTabs(scenarios) {
@@ -634,7 +634,7 @@ function getGwlfeTabs(scenarios) {
     // This is to pacify the linter.
     scenarios.findWhere({ active: true});
 
-    return [
+    return new models.TabsCollection([
         {
             name: 'Hydrology',
             table: hydrologyTable,
@@ -646,7 +646,7 @@ function getGwlfeTabs(scenarios) {
             table: qualityTable,
             charts: qualityCharts,
         },
-    ];
+    ]);
 }
 
 function copyScenario(scenario, aoi_census) {

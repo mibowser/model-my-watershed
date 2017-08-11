@@ -41,15 +41,6 @@ var TabModel = Backbone.Model.extend({
         table: null,  // TableRowsCollection
         charts: null, // ChartRowCollection
     },
-
-    initialize: function(attrs) {
-        Backbone.Model.prototype.initialize.apply(this, arguments);
-
-        this.set({
-            table: new TableRowsCollection(attrs.table),
-            charts: new ChartRowsCollection(attrs.charts),
-        });
-    },
 });
 
 var TabsCollection = Backbone.Collection.extend({
@@ -62,16 +53,6 @@ var WindowModel = Backbone.Model.extend({
         mode: CHART, // or TABLE
         scenarios: null, // ScenariosCollection
         tabs: null,  // TabsCollection
-    },
-
-    initialize: function(attrs) {
-        Backbone.Model.prototype.initialize.apply(this, arguments);
-
-        this.set({
-            controls: attrs.controls,
-            tabs: new TabsCollection(attrs.tabs),
-            scenarios: attrs.scenarios,
-        });
     },
 
     addOrReplaceInput: function(input) {
