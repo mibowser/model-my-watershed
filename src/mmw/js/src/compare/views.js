@@ -198,7 +198,7 @@ var ChartRowView = Marionette.ItemView.extend({
             stacked = name.indexOf("Hydrology") > -1,
             precipitation = this.model.get("precipitation"),
             values = this.model.get("values"),
-            data = stacked ? ["et", "runoff", "inf"].map(function(key) {
+            data = stacked ? ["inf", "runoff", "et"].map(function(key) {
                     return {
                         key: key,
                         values: values.map(function(value, index) {
