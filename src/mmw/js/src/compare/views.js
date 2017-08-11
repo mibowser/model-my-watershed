@@ -49,18 +49,6 @@ var CompareWindow2 = Marionette.LayoutView.extend({
         sectionsRegion: '.compare-sections',
     },
 
-    initialize: function() {
-        var self = this;
-        this.model.get('scenarios').forEach(function(scenario) {
-            scenario.get('results').on('change', function(r) {
-                if (r.get('name') === 'runoff' && !r.get('polling')) {
-                    self.model.set('tabs', new models.TabsCollection(
-                        formatTr55CompareData(self.model.get('scenarios'))));
-                }
-            });
-        });
-    },
-
     onShow: function() {
         this.tabRegion.show(new TabPanelsView({
             collection: this.model.get('tabs'),
