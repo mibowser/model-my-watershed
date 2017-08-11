@@ -39,7 +39,7 @@ var CompareWindow2 = Marionette.LayoutView.extend({
     },
 
     modelEvents: {
-        'change:mode change:tabs': 'showSectionsView',
+        'change:mode': 'showSectionsView',
     },
 
     regions: {
@@ -226,6 +226,9 @@ var ChartRowView = Marionette.ItemView.extend({
 
 var ChartView = Marionette.CollectionView.extend({
     childView: ChartRowView,
+    collectionEvents: {
+        'change': 'render',
+    },
 });
 
 var TableRowView = Marionette.ItemView.extend({
@@ -235,6 +238,9 @@ var TableRowView = Marionette.ItemView.extend({
 
 var TableView = Marionette.CollectionView.extend({
     childView: TableRowView,
+    collectionEvents: {
+        'change': 'render',
+    },
 });
 
 var CompareWindow = Marionette.LayoutView.extend({
